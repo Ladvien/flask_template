@@ -8,77 +8,114 @@ import getpass
 print("Welcome to Nginx, Flask, and uWSGI setup.")
 username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
+app_name = input("What's your app name? ")
+
+# # Update the system.
+# os.system("yum update -y")
 
 
-# Update the system.
-os.system("yum update -y")
+# centos_dev_tools = " ".join([
+#         "python3-pip",
+#         "python36-devel.x86_64", 
+#         "gcc", 
+#         "gcc-c++",
+#         "make", 
+#         "openssl-devel",
+#         "libffi",
+#         "libffi-devel",
+#         "python3-setuptools"
+# ])
 
+# nginx_and_tools = " ".join([
+#     "epel-release",
+#     "nginx"
+# ])
 
-centos_dev_tools = " ".join([
-        "python3-pip",
-        "python36-devel.x86_64", 
-        "gcc", 
-        "gcc-c++",
-        "make", 
-        "openssl-devel",
-        "libffi",
-        "libffi-devel",
-        "python3-setuptools"
-])
+# pip_packages = " ".join([
+#     "flask",
+#     "Flask-SQLAlchemy",
+#     "uwsgi"
+# ])
 
-nginx_and_tools = " ".join([
-    "epel-release",
-    "nginx"
-])
+# #################
+# # Install Tools #
+# #################
+# # Install needed dev tools.
+# os.system(f"yum install {centos_dev_tools} -y")
 
-pipenv_packages = " ".join([
-    "flask",
-    "Flask-SQLAlchemy",
-    "uwsgi"
-])
+# # Install Nginx
+# os.system(f"yum install {nginx_and_tools} -y")
 
-#################
-# Install Tools #
-#################
-# Install needed dev tools.
-os.system(f"yum install {centos_dev_tools} -y")
+# #################
+# # Env. Setup    #
+# #################
+# # 1. Setup user
+# os.system(f"adduser {username}")
+# os.system(f"""echo "{password}" | passwd --stdin {username}""")
+# os.system(f"usermod -aG wheel {username}")
 
-# Install Nginx
-os.system(f"yum install {nginx_and_tools} -y")
+# # Move the file to the user's directory.
+# app_abs_path = f"/home/{username}/app/"
+# os.system(f"cp -r ../app/ {app_abs_path}")
+# os.system(f"chown -R ladvien:ladvien {app_abs_path}")
 
-#################
-# Env. Setup    #
-#################
-# 1. Setup user
-os.system(f"adduser {username}")
-os.system(f"""echo "{password}" | passwd --stdin {username}""")
-os.system(f"usermod -aG wheel {username}")
+# ###############
+# # Setup Nginx #
+# ###############
+# # Start Nginx
+# os.system("systemctl enable nginx")
+# os.system("systemctl start nginx")
 
-# Move the file to the user's directory.
-app_abs_path = f"/home/{username}/app/"
-os.system(f"cp -r ../app/ {app_abs_path}")
-os.system(f"chown -R ladvien:ladvien {app_abs_path}")
+# # Open CentoS firewall
+# os.system("firewall-cmd --zone=public --permanent --add-service=http")
+# os.system("firewall-cmd --zone=public --permanent --add-service=https")
+# os.system("firewall-cmd --zone=public --add-port=5000/tcp --permanent")
+# os.system("firewall-cmd --reload")
 
-###############
-# Setup Nginx #
-###############
-# Start Nginx
-os.system("systemctl enable nginx")
-os.system("systemctl start nginx")
-
-# Open CentoS firewall
-os.system("firewall-cmd --zone=public --permanent --add-service=http")
-os.system("firewall-cmd --zone=public --permanent --add-service=https")
-os.system("firewall-cmd --reload")
-
+# TODO: Create uWSGI daemon. 
 # TODO: Configure Nginx.
 # TODO: Certbot
+# TODO: Install MariaDB
+
+#################
+# Create Daemon #
+#################
+with open(os.getcwd() + f"/resources/{app_name}.service", "w") as f:
+    f.write(f"""[Unit]
+Description=uWSGI instance to serve {app_name}
+After=network.target
+
+[Service]
+User={username}
+Group=www-data
+WorkingDirectory=/home/{username}/{app_name}
+ExecStart=/home/{username}/{app_name}/uwsgi --ini {app_name}.ini
+
+[Install]
+WantedBy=multi-user.target
+""")
+#################
+# Create uWSGI  #
+#################
+with open(os.getcwd() + f"/resources/{app_name}.service", "w") as f:
+    f.write(f"""[Unit]
+Description=uWSGI instance to serve {app_name}
+After=network.target
+
+[Service]
+User={username}
+Group=www-data
+WorkingDirectory=/home/{username}/{app_name}
+ExecStart=/home/{username}/{app_name}/uwsgi --ini {app_name}.ini
+
+[Install]
+WantedBy=multi-user.target
+""")
 
 ###############
 # Setup uWSGI #
 ###############
 # Install pipenv
-os.system("pip3 install pipenv")
-# Setup environment
-os.system(f"pipenv install {pipenv_packages}")
+# os.system(f"pip3 install {pip_packages}")
+
 
