@@ -80,7 +80,9 @@ app_name = input("What's your app name? ")
 #################
 # Create Daemon #
 #################
-with open(os.getcwd() + f"/resources/{app_name}.service", "w") as f:
+os.chdir("..")
+daemon_file_path = os.getcwd() + f"/resources/{app_name}.service"
+with open(daemon_file_path, "w") as f:
     f.write(f"""[Unit]
 Description=uWSGI instance to serve {app_name}
 After=network.target
@@ -94,24 +96,9 @@ ExecStart=/home/{username}/{app_name}/uwsgi --ini {app_name}.ini
 [Install]
 WantedBy=multi-user.target
 """)
-#################
-# Create uWSGI  #
-#################
-with open(os.getcwd() + f"/resources/{app_name}.service", "w") as f:
-    f.write(f"""[Unit]
-Description=uWSGI instance to serve {app_name}
-After=network.target
-
-[Service]
-User={username}
-Group=www-data
-WorkingDirectory=/home/{username}/{app_name}
-ExecStart=/home/{username}/{app_name}/uwsgi --ini {app_name}.ini
-
-[Install]
-WantedBy=multi-user.target
-""")
-
+os.chdir("./install")
+os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
+os.system(f"chmod 755 /etc/systemd/system/{app_name}.service")
 ###############
 # Setup uWSGI #
 ###############
