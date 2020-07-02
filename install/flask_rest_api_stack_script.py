@@ -11,25 +11,32 @@ username = input("What's the name the user? ")
 password = stdiomask.getpass()
 
 # Update the system.
-# os.system("yum update -y")
+os.system("yum update -y")
 
 # Install needed dev tools.
-# os.system("""yum install python3-pip python36-devel.x86_64 gcc gcc-c++\
-#              make openssl-devel libffi libffi-devel python3-setuptools -y""")
+os.system("""yum install python3-pip python36-devel.x86_64 gcc gcc-c++\
+             make openssl-devel libffi libffi-devel python3-setuptools -y""")
 
 # Install Nginx
-# os.system("yum install epel-release nginx -y")
+os.system("yum install epel-release nginx -y")
+
+
 
 # 1. Setup user
 os.system(f"adduser {username}")
 os.system(f"""echo "{password}" | passwd --stdin {username}""")
 os.system(f"usermod -aG wheel {username}")
 
+# Move the file to the user's directory.
+app_abs_path = f"/home/{username}/app/"
+os.system(f"cp -r ../app/ {app_abs_path}")
+os.system(f"chown -R ladvien:ladvien {app_abs_path}")
+
 # 2. Setup Nginx.
 
 # 3. Setup uWSGI.
 # Install pipenv
-# os.system("pip3 install pipenv")
+os.system("pip3 install pipenv")
 # Setup environment
-# os.system("pipenv install flask Flask-SQLAlchemy uwsgi")
+os.system("pipenv install flask Flask-SQLAlchemy uwsgi")
 
