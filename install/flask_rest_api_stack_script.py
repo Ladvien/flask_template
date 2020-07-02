@@ -1,16 +1,13 @@
 import os
 import pip
-
+import getpass
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
-# For safe password entering.
-pip.main(["install", "stdiomask"])
-import stdiomask
 
 print("Welcome to Nginx, Flask, and uWSGI setup.")
 username = input("What's the name the user? ")
-password = stdiomask.getpass()
+password = getpass.getpass(prompt = "Password: ")
 
 #################
 # Install Tools #
