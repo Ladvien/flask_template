@@ -9,18 +9,42 @@ print("Welcome to Nginx, Flask, and uWSGI setup.")
 username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 
-#################
-# Install Tools #
-#################
+
 # Update the system.
 os.system("yum update -y")
 
+
+centos_dev_tools = " ".join([
+        "python3-pip",
+        "python36-devel.x86_64", 
+        "gcc", 
+        "gcc-c++",
+        "make", 
+        "openssl-devel",
+        "libffi",
+        "libffi-devel",
+        "python3-setuptools"
+])
+
+nginx_and_tools = " ".join([
+    "epel-release",
+    "nginx"
+])
+
+pipenv_packages = " ".join([
+    "flask",
+    "Flask-SQLAlchemy",
+    "uwsgi"
+])
+
+#################
+# Install Tools #
+#################
 # Install needed dev tools.
-os.system("""yum install python3-pip python36-devel.x86_64 gcc gcc-c++\
-             make openssl-devel libffi libffi-devel python3-setuptools -y""")
+os.system(f"yum install {centos_dev_tools} -y")
 
 # Install Nginx
-os.system("yum install epel-release nginx -y")
+os.system(f"yum install {nginx_and_tools} -y")
 
 #################
 # Env. Setup    #
@@ -41,7 +65,6 @@ os.system(f"chown -R ladvien:ladvien {app_abs_path}")
 # Start Nginx
 os.system("systemctl enable nginx")
 os.system("systemctl start nginx")
-os.system("sudo systemctl status nginx")
 
 # Open CentoS firewall
 os.system("firewall-cmd --zone=public --permanent --add-service=http")
@@ -57,5 +80,5 @@ os.system("firewall-cmd --reload")
 # Install pipenv
 os.system("pip3 install pipenv")
 # Setup environment
-os.system("pipenv install flask Flask-SQLAlchemy uwsgi")
+os.system(f"pipenv install {pipenv_packages}")
 
