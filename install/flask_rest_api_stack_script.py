@@ -90,7 +90,7 @@ After=network.target
 
 [Service]
 Restart=always
-WorkingDirectory=/home/{username}/{app_name}
+WorkingDirectory=/home/{username}/{app_name}/
 ExecStart=/usr/local/bin/uwsgi --ini /home/{username}/{app_name}/app.ini
 KillSignal=SIGQUIT
 Type=notify
@@ -102,7 +102,8 @@ WantedBy=multi-user.target
 os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
-# os.system(f"ln -s /usr/lib/systemd/system/{app_name}.service /etc/systemd/system/{app_name}.service")
+os.system(f"systemctl enable {app_name}.service")
+
 ###############
 # Setup uWSGI #
 ###############
