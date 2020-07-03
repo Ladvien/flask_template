@@ -58,6 +58,7 @@ os.system(f"yum install {nginx_and_tools} -y")
 #################
 # Env. Setup    #
 #################
+os.system("exec $SHELL")
 # 1. Setup user
 os.system(f"adduser {username}")
 os.system(f"""echo "{password}" | passwd --stdin {username}""")
@@ -66,7 +67,7 @@ os.system(f"usermod -aG wheel {username}")
 # Move the file to the user's directory.
 app_abs_path = f"/home/{username}/{app_name}/"
 os.system(f"cp -r ../app/ {app_abs_path}")
-os.system(f"chown -R ladvien:ladvien {app_abs_path}")
+os.system(f"chown -R {username}:{username} {app_abs_path}")
 
 ###############
 # Setup Nginx #
