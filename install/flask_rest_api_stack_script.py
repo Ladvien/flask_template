@@ -13,6 +13,10 @@ print()
 username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
+site = input("Site name? (e.g., cool-site.com")
+
+site_name = site.split(".")[0]
+
 print()
 # Update the system.
 os.system("yum update -y")
@@ -127,7 +131,7 @@ module = wsgi:app
 master = true
 processes = 5
 
-https = :9090,foobar.crt,foobar.key
+https = :9090,maddatum.crt,maddatum.key
 
 uid = {username}
 socket = /home/{username}/{app_name}/app.sock
@@ -153,5 +157,8 @@ print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
 print()
 os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
+os.system(f"mv /etc/letsencrypt/live/{site}/cert.pem /home/{username}/{app_name}/{site_name}.crt")
+os.system(f"mv /etc/letsencrypt/live/{site}/privkey.pem /home/{username}/{app_name}/{site_name}.key")
+
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
