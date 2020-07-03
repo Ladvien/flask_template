@@ -131,7 +131,7 @@ module = wsgi:app
 master = true
 processes = 5
 
-https = :9090,maddatum.crt,maddatum.key
+https = :9090,{site_name}.crt,{site_name}.key
 
 uid = {username}
 socket = /home/{username}/{app_name}/app.sock
