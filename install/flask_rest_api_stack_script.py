@@ -18,7 +18,6 @@ os.system("yum update -y")
 
 centos_dev_tools = " ".join([
         "python3-pip",
-        # "python36-devel.x86_64", 
         "python3-devel",
         "gcc", 
         "gcc-c++",
@@ -33,7 +32,6 @@ nginx_and_tools = " ".join([
     "epel-release",
     "nginx",
     "certbot",
-    "python3-certbot-nginx",
     "python2-certbot-nginx",
 ])
 
