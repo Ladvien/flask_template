@@ -128,7 +128,7 @@ master = true
 processes = 5
 
 uid = user
-socket = /run/uwsgi/app.sock
+socket = /home/{username}/{app_name}/app.sock
 chown-socket = {username}:nginx
 chmod-socket = 660
 vacuum = true
