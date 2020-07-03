@@ -127,7 +127,9 @@ module = wsgi:app
 master = true
 processes = 5
 
-uid = user
+https = :9090,foobar.crt,foobar.key
+
+uid = {username}
 socket = /home/{username}/{app_name}/app.sock
 chown-socket = {username}:nginx
 chmod-socket = 660
