@@ -50,15 +50,13 @@ pip_packages = " ".join([
 # Install needed dev tools.
 os.system(f"yum install {centos_dev_tools} -y")
 
-# Install 
-os.system(f"yum install {nginx_and_tools} -y")
 # Install Nginx
 os.system(f"yum install {nginx_and_tools} -y")
 
 #################
 # Env. Setup    #
 #################
-os.system("exec $SHELL")
+
 # 1. Setup user
 os.system(f"adduser {username}")
 os.system(f"""echo "{password}" | passwd --stdin {username}""")
@@ -114,8 +112,6 @@ WantedBy=multi-user.target
 os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
-os.system(f"systemctl enable {app_name}.service")
-os.system(f"systemctl start {app_name}.service")
 
 ###############
 # Setup uWSGI #
@@ -124,3 +120,8 @@ os.system(f"systemctl start {app_name}.service")
 os.system(f"pip3 install {pip_packages}")
 
 
+###################
+# Daemonize Flask #
+###################
+os.system(f"systemctl enable {app_name}.service")
+os.system(f"systemctl start {app_name}.service")
