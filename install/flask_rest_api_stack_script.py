@@ -118,7 +118,23 @@ os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
 ###############
 # Install pipenv
 os.system(f"pip3 install {pip_packages}")
+os.chdir("..")
+daemon_file_path = os.getcwd() + f"/app/app.ini"
+with open(daemon_file_path, "w") as f:
+    f.write(f"""[uwsgi]
+module = wsgi:app
 
+master = true
+processes = 5
+
+uid = user
+socket = /run/uwsgi/app.sock
+chown-socket = {username}:nginx
+chmod-socket = 660
+vacuum = true
+
+die-on-term = true
+"""
 
 ###################
 # Daemonize Flask #
