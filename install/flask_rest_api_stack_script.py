@@ -125,3 +125,13 @@ os.system(f"pip3 install {pip_packages}")
 ###################
 os.system(f"systemctl enable {app_name}.service")
 os.system(f"systemctl start {app_name}.service")
+
+#########################
+# Setup HTTPs for Nginx #
+#########################
+print()
+print("#############################################")
+print("# Time to setup HTTPs using Certbot         #")
+print("#############################################")
+print()
+os.system(f"sudo certbot --nginx")

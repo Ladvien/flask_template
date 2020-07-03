@@ -7,4 +7,4 @@ nginx_and_tools = " ".join([
     "python2-certbot-nginx",
 ])
 
-os.system(f"yum install {nginx_and_tools} -y")
+os.system(f"sudo certbot --nginx")
