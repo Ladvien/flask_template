@@ -16,7 +16,8 @@ os.system("yum update -y")
 
 centos_dev_tools = " ".join([
         "python3-pip",
-        "python36-devel.x86_64", 
+        # "python36-devel.x86_64", 
+        "python3-devel",
         "gcc", 
         "gcc-c++",
         "make", 
