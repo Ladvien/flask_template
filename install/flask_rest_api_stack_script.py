@@ -4,6 +4,8 @@ import getpass
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
+print()
+print()
 print("#############################################")
 print("# Welcome to Nginx, Flask, and uWSGI setup. #")
 print("#############################################")
@@ -15,6 +17,8 @@ print()
 # Update the system.
 os.system("yum update -y")
 
+# Install extra packages for RedHat
+os.system("yum install epel-release -y")
 
 centos_dev_tools = " ".join([
         "python3-pip",
@@ -29,7 +33,6 @@ centos_dev_tools = " ".join([
 ])
 
 nginx_and_tools = " ".join([
-    "epel-release",
     "nginx",
     "certbot",
     "python2-certbot-nginx",
@@ -47,6 +50,8 @@ pip_packages = " ".join([
 # Install needed dev tools.
 os.system(f"yum install {centos_dev_tools} -y")
 
+# Install 
+os.system(f"yum install {nginx_and_tools} -y")
 # Install Nginx
 os.system(f"yum install {nginx_and_tools} -y")
 
