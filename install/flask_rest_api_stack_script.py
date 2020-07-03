@@ -86,27 +86,26 @@ with open(daemon_file_path, "w") as f:
     f.write(f"""[Unit]
 Description=uWSGI instance to serve {app_name}
 After=network.target
-StartLimitIntervalSec=0
 
 [Service]
-Type=simple
-User={username}
 Restart=always
-RestartSec=1
-Group=www-data
 WorkingDirectory=/home/{username}/{app_name}
-ExecStart=/home/{username}/{app_name}/uwsgi --ini {app_name}.ini
+ExecStart=/usr/local/bin/uwsgi --ini /home/{username}/{app_name}/app.ini
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target
 """)
 os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
-os.system(f"chmod 755 /etc/systemd/system/{app_name}.service")
+os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
+# os.system(f"ln -s /usr/lib/systemd/system/{app_name}.service /etc/systemd/system/{app_name}.service")
 ###############
 # Setup uWSGI #
 ###############
 # Install pipenv
-# os.system(f"pip3 install {pip_packages}")
+os.system(f"pip3 install {pip_packages}")
 
 
