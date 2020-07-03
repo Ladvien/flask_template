@@ -13,7 +13,7 @@ print()
 username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
-site = input("Site name? (e.g., cool-site.com")
+site = input("Site name? (e.g., cool-site.com) ")
 
 site_name = site.split(".")[0]
 
@@ -65,18 +65,6 @@ os.system(f"yum install {nginx_and_tools} -y")
 os.system(f"adduser {username}")
 os.system(f"""echo "{password}" | passwd --stdin {username}""")
 os.system(f"usermod -aG wheel {username}")
-
-# Move the file to the user's directory.
-app_abs_path = f"/home/{username}/{app_name}/"
-os.system(f"cp -r ../app/ {app_abs_path}")
-os.system(f"chown -R {username}:{username} {app_abs_path}")
-
-###############
-# Setup Nginx #
-###############
-# Start Nginx
-os.system("systemctl enable nginx")
-os.system("systemctl start nginx")
 
 # Open CentoS firewall
 os.system("firewall-cmd --zone=public --permanent --add-service=http")
@@ -142,11 +130,7 @@ vacuum = true
 die-on-term = true
 """)
 
-###################
-# Daemonize Flask #
-###################
-os.system(f"systemctl enable {app_name}.service")
-os.system(f"systemctl start {app_name}.service")
+
 
 #########################
 # Setup HTTPs for Nginx #
@@ -159,6 +143,25 @@ print()
 os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
 os.system(f"mv /etc/letsencrypt/live/{site}/cert.pem /home/{username}/{app_name}/{site_name}.crt")
 os.system(f"mv /etc/letsencrypt/live/{site}/privkey.pem /home/{username}/{app_name}/{site_name}.key")
+os.system(f"chown $USER:$USER /home/{username}/{app_name}/{site_name}.crt /home/{username}/{app_name}/{site_name}.key")
 
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
+
+# Move the file to the user's directory.
+app_abs_path = f"/home/{username}/{app_name}/"
+os.system(f"cp -r ../app/ {app_abs_path}")
+os.system(f"chown -R {username}:{username} {app_abs_path}")
+
+
+###############
+# Start Nginx #
+###############
+os.system("systemctl enable nginx")
+os.system("systemctl start nginx")
+
+###################
+# Daemonize Flask #
+###################
+os.system(f"systemctl enable {app_name}.service")
+os.system(f"systemctl start {app_name}.service")
