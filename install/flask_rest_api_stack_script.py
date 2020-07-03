@@ -26,18 +26,21 @@ centos_dev_tools = " ".join([
         "openssl-devel",
         "libffi",
         "libffi-devel",
-        "python3-setuptools"
+        "python3-setuptools",
 ])
 
 nginx_and_tools = " ".join([
     "epel-release",
-    "nginx"
+    "nginx",
+    "certbot",
+    "python3-certbot-nginx",
+    "python2-certbot-nginx",
 ])
 
 pip_packages = " ".join([
     "flask",
     "Flask-SQLAlchemy",
-    "uwsgi"
+    "uwsgi",
 ])
 
 #################
@@ -75,7 +78,10 @@ os.system("firewall-cmd --zone=public --permanent --add-service=https")
 os.system("firewall-cmd --zone=public --add-port=5000/tcp --permanent")
 os.system("firewall-cmd --reload")
 
-# TODO: Create uWSGI daemon. 
+#################
+# Setup Certbot #
+#################
+
 # TODO: Configure Nginx.
 # TODO: Certbot
 # TODO: Install MariaDB
