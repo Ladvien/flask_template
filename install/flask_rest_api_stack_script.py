@@ -4,12 +4,14 @@ import getpass
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
-
-print("Welcome to Nginx, Flask, and uWSGI setup.")
+print("#############################################")
+print("# Welcome to Nginx, Flask, and uWSGI setup. #")
+print("#############################################")
+print()
 username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
-
+print()
 # Update the system.
 os.system("yum update -y")
 
@@ -103,6 +105,7 @@ os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
 os.system(f"systemctl enable {app_name}.service")
+os.system(f"systemctl start {app_name}.service")
 
 ###############
 # Setup uWSGI #
