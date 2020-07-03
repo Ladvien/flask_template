@@ -7,4 +7,4 @@ nginx_and_tools = " ".join([
     "python2-certbot-nginx",
 ])
 
-os.system(f"sudo certbot --nginx")
+os.system(f"sudo certbot -d maddatum.com -d www.maddatum.com")

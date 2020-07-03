@@ -152,6 +152,6 @@ print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
 print()
-os.system(f"sudo certbot --nginx")
+os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
