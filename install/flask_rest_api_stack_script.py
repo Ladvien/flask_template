@@ -94,7 +94,8 @@ Description=uWSGI instance to serve {app_name}
 After=network.target
 
 [Service]
-Restart=always
+User={username}
+Group=nginx
 WorkingDirectory=/home/{username}/{app_name}/
 ExecStart=/usr/local/bin/uwsgi --ini /home/{username}/{app_name}/app.ini
 KillSignal=SIGQUIT
@@ -137,7 +138,9 @@ die-on-term = true
 # Move the file to the user's directory.
 app_abs_path = f"/home/{username}/{app_name}/"
 os.system(f"cp -r app/ {app_abs_path}")
-os.system(f"chown -R {username}:{username} {app_abs_path}")
+os.system(f"chown -R {username}:nginx {app_abs_path}")
+
+os.system(f"systemctl start {app_name}.service")
 
 #########################
 # Setup HTTPs for Nginx #
