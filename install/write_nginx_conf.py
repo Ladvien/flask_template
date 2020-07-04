@@ -61,9 +61,10 @@ http {{
         ssl_certificate_key "/etc/letsencrypt/live/{site}/{site_name}.key";
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
-        ssl_ciphers PROFILE=SYSTEM;
+        # ssl_ciphers PROFILE=SYSTEM;
         ssl_prefer_server_ciphers on;
-
+        ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
+        
         # Load configuration files for the default server block.
         include /etc/nginx/default.d/*.conf;
 

@@ -122,7 +122,8 @@ module = wsgi:app
 master = true
 processes = 5
 
-https = :5000,/etc/letsencrypt/live/{site}/{site_name}.crt,/etc/letsencrypt/live/{site}/{site_name}.key
+shared-socket = :443
+https = =0,/etc/letsencrypt/live/{site}/{site_name}.crt,/etc/letsencrypt/live/{site}/{site_name}.key
 
 uid = {username}
 socket = /home/{username}/{app_name}/app.sock
@@ -146,7 +147,6 @@ print()
 
 # Move the file to the user's directory.
 app_abs_path = f"/home/{username}/{app_name}/"
-print(os.getcwd())
 os.system(f"cp -r app/ {app_abs_path}")
 os.system(f"chown -R {username}:{username} {app_abs_path}")
 
