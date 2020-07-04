@@ -51,18 +51,22 @@ pip_packages = " ".join([
     "uwsgi",
 ])
 
+print(""""
 #################
 # Install Tools #
 #################
+""")
 # Install needed dev tools.
 os.system(f"yum install {centos_dev_tools} -y")
 
 # Install Nginx
 os.system(f"yum install {nginx_and_tools} -y")
 
+print(""""
 #################
 # Env. Setup    #
 #################
+""")
 
 # 1. Setup user
 os.system(f"adduser {username}")
@@ -83,9 +87,11 @@ os.system("firewall-cmd --reload")
 # TODO: Certbot
 # TODO: Install MariaDB
 
+print(""""
 #################
 # Create Daemon #
 #################
+""")
 os.chdir("..")
 daemon_file_path = os.getcwd() + f"/resources/{app_name}.service"
 with open(daemon_file_path, "w") as f:
@@ -109,9 +115,11 @@ os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
 
+print(""""
 ###############
 # Setup uWSGI #
 ###############
+""")
 # Install pipenv
 os.system(f"pip3 install {pip_packages}")
 os.chdir("..")
@@ -123,7 +131,7 @@ module = wsgi:app
 master = true
 processes = 5
 
-http-socket = :80
+http-socket = :5000
 
 uid = {username}
 socket = /home/{username}/{app_name}/app.sock
@@ -134,18 +142,31 @@ vacuum = true
 die-on-term = true
 """)
 
-
+print(""""
+#########################
+# Put App in Place      #
+#########################
+""")
 # Move the file to the user's directory.
 app_abs_path = f"/home/{username}/{app_name}/"
 os.system(f"cp -r app/ {app_abs_path}")
 os.system(f"chown -R {username}:nginx {app_abs_path}")
+os.system(f"chmod -R 710 /home/{username} ")
 
+print(""""
+#########################
+# Start App Service     #
+#########################
+""")
+os.system(f"systemctl enable {app_name}.service")
 os.system(f"systemctl start {app_name}.service")
 
+print("""
 #########################
 # Setup HTTPs for Nginx #
 #########################
-print()
+""")
+
 print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
@@ -157,16 +178,18 @@ os.system("systemctl start nginx.service")
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
 
-
+print(""""
 ###############
 # Setup Nginx #
 ###############
+""")
 write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site)
 os.system("systemctl daemon-reload")
 os.system("systemctl restart nginx")
 
+print(""""
 ###################
 # Daemonize Flask #
 ###################
-os.system(f"systemctl enable {app_name}.service")
-os.system(f"systemctl start {app_name}.service")
+""")
+os.system(f"systemctl restart {app_name}.service")
