@@ -19,7 +19,8 @@ import pip
 import getpass
 
 from write_nginx_conf import write_nginx_conf
-
+from write_uwsgi_daemon import write_uwsgi_daemon
+from write_uwsgi_ini import write_uwsgi_ini
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
@@ -109,21 +110,7 @@ print("""
 """)
 os.chdir("..")
 daemon_file_path = os.getcwd() + f"/resources/{app_name}.service"
-with open(daemon_file_path, "w") as f:
-    f.write(f"""[Unit]
-Description=uWSGI instance to serve {app_name}
-After=network.target
-
-[Service]
-User=nginx
-Group=nginx
-WorkingDirectory=/usr/share/nginx/{app_name}/
-ExecStart=/usr/local/bin/uwsgi --ini /usr/share/nginx/{app_name}/app.ini
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-""")
+write_uwsgi_daemon(daemon_file_path, username, password, app_name, site)
 os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
@@ -137,22 +124,7 @@ print("""
 os.system(f"pip3 install {pip_packages}")
 os.chdir("..")
 uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
-with open(uwsgi_ini_path, "w") as f:
-    f.write(f"""[uwsgi]
-module = wsgi:app
-uid = nginx
-gid = nginx
-chown-socket = nginx:nginx
-chmod-socket = 777
-
-processes = 5
-thread = 5
-pythonpath = /usr/bin/python3
-socket = /usr/share/nginx/{app_name}/app.sock
-
-harakiri = 15
-""")
-
+write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
 
 print("""
 #########################
