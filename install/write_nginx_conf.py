@@ -57,8 +57,8 @@ http {{
         server_name {site} wwww.{site};
         root         /usr/share/nginx/html;
 
-        ssl_certificate "/home/{username}/{app_name}/{site_name}.crt";
-        ssl_certificate_key "/home/{username}/{app_name}/{site_name}.key";
+        ssl_certificate "/etc/letsencrypt/live/{site}/{site_name}.crt";
+        ssl_certificate_key "/etc/letsencrypt/live/{site}/{site_name}.key";
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
         ssl_ciphers PROFILE=SYSTEM;
