@@ -1,3 +1,19 @@
+"""
+On CentOS 7:
+    For problems using nginx as to reverse proxy uWSGI, check the logs at:
+        /var/log/nginx/access.log
+        /var/log/nginx/error.log
+    If not collected, these can be set in the nginx.conf
+        error_log /var/log/nginx/error.log;
+        http { access_log  /var/log/nginx/access.log  main; }
+
+    It appears SELinux caused the "permission denied while connection to upstream" when using nginx to reverse proxy.
+        https://stackoverflow.com/a/49492644
+      
+"""
+
+
+
 import os
 import pip
 import getpass
@@ -100,13 +116,11 @@ Description=uWSGI instance to serve {app_name}
 After=network.target
 
 [Service]
-User={username}
+User=nginx
 Group=nginx
-WorkingDirectory=/home/{username}/{app_name}/
-ExecStart=/usr/local/bin/uwsgi --ini /home/{username}/{app_name}/app.ini
-KillSignal=SIGQUIT
-Type=notify
-NotifyAccess=all
+WorkingDirectory=/usr/share/nginx/{app_name}/
+ExecStart=/usr/local/bin/uwsgi --ini /usr/share/nginx/{app_name}/app.ini
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
@@ -127,20 +141,19 @@ uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
 with open(uwsgi_ini_path, "w") as f:
     f.write(f"""[uwsgi]
 module = wsgi:app
+uid = nginx
+gid = nginx
+chown-socket = nginx:nginx
+chmod-socket = 777
 
-master = true
 processes = 5
+thread = 5
+pythonpath = /usr/bin/python3
+socket = /usr/share/nginx/{app_name}/app.sock
 
-http-socket = :5000
-
-uid = {username}
-socket = /home/{username}/{app_name}/app.sock
-chown-socket = {username}:nginx
-chmod-socket = 660
-vacuum = true
-
-die-on-term = true
+harakiri = 15
 """)
+
 
 print("""
 #########################
@@ -148,10 +161,15 @@ print("""
 #########################
 """)
 # Move the file to the user's directory.
-app_abs_path = f"/home/{username}/{app_name}/"
+app_abs_path = f"/usr/share/nginx/{app_name}/"
+
+if os.path.exists(app_abs_path):
+    os.system(f"rm -rf {app_abs_path}")
+    print("Deleted old files.")
+
 os.system(f"cp -r app/ {app_abs_path}")
-os.system(f"chown -R {username}:nginx {app_abs_path}")
-os.system(f"chmod -R 710 /home/{username} ")
+os.system(f"chown -R nginx:nginx {app_abs_path}")
+os.system(f"chmod -R 777 {app_abs_path} ")
 
 print("""
 #########################

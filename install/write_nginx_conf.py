@@ -13,7 +13,7 @@ error_log /var/log/nginx/error.log;
 pid /run/nginx.pid;
 
 # Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
-include /usr/share/nginx/modules/*.conf;
+# include /usr/share/nginx/modules/*.conf;
 
 events {{
     worker_connections 1024;
@@ -38,17 +38,18 @@ http {{
     # Load modular configuration files from the /etc/nginx/conf.d directory.
     # See http://nginx.org/en/docs/ngx_core_module.html#include
     # for more information.
-    include /etc/nginx/conf.d/*.conf;
+    # include /etc/nginx/conf.d/*.conf;
 
     server {{
         listen 80;
-        real_ip_header X-Forwarded-For;
-        set_real_ip_from 127.0.0.1;
-        server_name localhost;
+        listen [::]:80;
+        # real_ip_header X-Forwarded-For;
+        # set_real_ip_from 127.0.0.1;
+        server_name maddatum.com www.maddatum.com;
         
         location / {{
             include uwsgi_params;
-            uwsgi_pass unix:/home/{username}/{app_name}/app.sock;
+            uwsgi_pass unix://usr/share/nginx/{app_name}/app.sock;
         }}
     }}
 
