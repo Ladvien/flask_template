@@ -210,3 +210,13 @@ print("""
 ###################
 """)
 os.system(f"systemctl restart {app_name}.service")
+
+print("""
+####################################
+# Add Nginx Permissions to SELinux #
+####################################
+""")
+os.system("setenforce Permissive")
+os.system("grep nginx /var/log/audit/audit.log | audit2allow -M nginx")
+os.system("semodule -i nginx.pp")
+os.system("setenforce Enforcing")

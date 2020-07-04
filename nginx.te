@@ -1,0 +1,20 @@
+
+module nginx 1.0;
+
+require {
+	type commplex_main_port_t;
+	type httpd_t;
+	type user_home_t;
+	type usr_t;
+	class sock_file write;
+	class tcp_socket name_connect;
+}
+
+#============= httpd_t ==============
+
+#!!!! This avc can be allowed using the boolean 'httpd_can_network_connect'
+allow httpd_t commplex_main_port_t:tcp_socket name_connect;
+allow httpd_t user_home_t:sock_file write;
+
+#!!!! WARNING: 'usr_t' is a base type.
+allow httpd_t usr_t:sock_file write;
