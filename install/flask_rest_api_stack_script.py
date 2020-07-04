@@ -51,7 +51,7 @@ pip_packages = " ".join([
     "uwsgi",
 ])
 
-print(""""
+print("""
 #################
 # Install Tools #
 #################
@@ -62,7 +62,7 @@ os.system(f"yum install {centos_dev_tools} -y")
 # Install Nginx
 os.system(f"yum install {nginx_and_tools} -y")
 
-print(""""
+print("""
 #################
 # Env. Setup    #
 #################
@@ -87,7 +87,7 @@ os.system("firewall-cmd --reload")
 # TODO: Certbot
 # TODO: Install MariaDB
 
-print(""""
+print("""
 #################
 # Create Daemon #
 #################
@@ -115,7 +115,7 @@ os.chdir("./install")
 os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
 
-print(""""
+print("""
 ###############
 # Setup uWSGI #
 ###############
@@ -142,7 +142,7 @@ vacuum = true
 die-on-term = true
 """)
 
-print(""""
+print("""
 #########################
 # Put App in Place      #
 #########################
@@ -153,7 +153,7 @@ os.system(f"cp -r app/ {app_abs_path}")
 os.system(f"chown -R {username}:nginx {app_abs_path}")
 os.system(f"chmod -R 710 /home/{username} ")
 
-print(""""
+print("""
 #########################
 # Start App Service     #
 #########################
@@ -178,7 +178,7 @@ os.system("systemctl start nginx.service")
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
 
-print(""""
+print("""
 ###############
 # Setup Nginx #
 ###############
@@ -187,7 +187,7 @@ write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site)
 os.system("systemctl daemon-reload")
 os.system("systemctl restart nginx")
 
-print(""""
+print("""
 ###################
 # Daemonize Flask #
 ###################
