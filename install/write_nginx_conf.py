@@ -45,7 +45,7 @@ http {{
         listen [::]:80;
         # real_ip_header X-Forwarded-For;
         # set_real_ip_from 127.0.0.1;
-        server_name maddatum.com www.maddatum.com;
+        server_name {site} www.{site};
         
         location / {{
             include uwsgi_params;

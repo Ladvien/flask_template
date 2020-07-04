@@ -92,7 +92,6 @@ os.system(f"usermod -aG wheel {username}")
 # Open CentoS firewall
 os.system("firewall-cmd --zone=public --permanent --add-service=http")
 os.system("firewall-cmd --zone=public --permanent --add-service=https")
-os.system("firewall-cmd --zone=public --add-port=5000/tcp --permanent")
 os.system("firewall-cmd --reload")
 
 #################
