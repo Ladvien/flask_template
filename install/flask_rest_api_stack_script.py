@@ -122,8 +122,7 @@ module = wsgi:app
 master = true
 processes = 5
 
-shared-socket = :443
-https = =0,/etc/letsencrypt/live/{site}/{site_name}.crt,/etc/letsencrypt/live/{site}/{site_name}.key
+http-socket = :80
 
 uid = {username}
 socket = /home/{username}/{app_name}/app.sock
@@ -135,6 +134,10 @@ die-on-term = true
 """)
 
 
+# Move the file to the user's directory.
+app_abs_path = f"/home/{username}/{app_name}/"
+os.system(f"cp -r app/ {app_abs_path}")
+os.system(f"chown -R {username}:{username} {app_abs_path}")
 
 #########################
 # Setup HTTPs for Nginx #
@@ -144,16 +147,9 @@ print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
 print()
-
-# Move the file to the user's directory.
-app_abs_path = f"/home/{username}/{app_name}/"
-os.system(f"cp -r app/ {app_abs_path}")
-os.system(f"chown -R {username}:{username} {app_abs_path}")
+os.system("systemctl start nginx.service")
 
 # os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
-# os.system(f"mv /etc/letsencrypt/live/{site}/cert.pem /etc/letsencrypt/live/{site}/{site_name}.crt")
-# os.system(f"mv /etc/letsencrypt/live/{site}/privkey.pem /etc/letsencrypt/live/{site}/{site_name}.key")
-# os.system(f"chown $USER:$USER /home/{username}/{app_name}/{site_name}.crt /home/{username}/{app_name}/{site_name}.key")
 
 # Add cron job to automatically renew.
 os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
@@ -163,6 +159,7 @@ os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time
 # Setup Nginx #
 ###############
 write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site)
+os.system("systemctl daemon-reload")
 os.system("systemctl restart nginx")
 
 ###################
