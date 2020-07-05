@@ -21,6 +21,8 @@ import getpass
 from write_nginx_conf import write_nginx_conf
 from write_uwsgi_daemon import write_uwsgi_daemon
 from write_uwsgi_ini import write_uwsgi_ini
+from util import execute_command_block
+
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
@@ -85,15 +87,20 @@ print("""
 #################
 """)
 
-# 1. Setup user
-os.system(f"adduser {username}")
-os.system(f"""echo "{password}" | passwd --stdin {username}""")
-os.system(f"usermod -aG wheel {username}")
+# Setup user
+cmd_user_setup = f"""adduser {username}
+echo "{password}" | passwd --stdin {username}
+os.system(f"usermod -aG wheel {username}
+"""
+execute_command_block(cmd_user_setup)
 
 # Open CentoS firewall
-os.system("firewall-cmd --zone=public --permanent --add-service=http")
-os.system("firewall-cmd --zone=public --permanent --add-service=https")
-os.system("firewall-cmd --reload")
+cmd_firewall_setup =\ 
+"""firewall-cmd --zone=public --permanent --add-service=http
+firewall-cmd --zone=public --permanent --add-service=https
+firewall-cmd --reload
+"""
+execute_command_block(cmd_firewall_setup)
 
 #################
 # Setup Certbot #
@@ -192,3 +199,18 @@ os.system("setenforce Permissive")
 os.system("grep nginx /var/log/audit/audit.log | audit2allow -M nginx")
 os.system("semodule -i nginx.pp")
 os.system("setenforce Enforcing")
+
+print("""
+####################################
+# Installing MariaDB               #
+####################################
+""")
+
+cmd_mariadb_setup = """
+yum install wget -y
+wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+chmod +x mariadb_repo_setup
+./mariadb_repo_setup
+yum install MariaDB-server -y
+"""
+execute_command_block(cmd_mariadb_setup)
