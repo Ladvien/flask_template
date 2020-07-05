@@ -56,6 +56,7 @@ centos_dev_tools = " ".join([
         "libffi",
         "libffi-devel",
         "python3-setuptools",
+        "python-dateutil",
 ])
 
 nginx_and_tools = " ".join([
