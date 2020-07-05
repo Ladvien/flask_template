@@ -231,21 +231,39 @@ GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
 FLUSH PRIVILEGES;
 """)
 
+print(f"""
+############################################################
+# Create the DATABASE_URL environment variable             #
+############################################################
+""")
+exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_profile")
+exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
+
+
+print("""
+###################
+# Clean Up        #
+###################
+""")
+exec_cmd("rm -f ../resources/*")
+
 
 print(f"""
 If successful, this script has:
     1. Updated the system.
     2. Added Flask, SQLAlchemy, Nginx, uWSGI, and MariaDB.
-    3. Setup a Linux user called {username}
+    3. Setup a Linux user called {username}.
     4. Setup a base Flask API project at /usr/share/nginx/{app_name}
-    5. Configured Nginx to reverse proxty uWSGI, which serves the Flask app {app_name}
-    6. Installed the latest version of MaraiDB and added a user called {app_name} 
+    5. Configured Nginx to reverse proxty uWSGI, which serves the Flask app {app_name}.
+    6. Installed the latest version of MaraiDB and added a user called {app_name}.
     7. Added a DB called {app_name}.
     8. A uWSGI daemon created at /etc/systemd/system/{app_name}.service
     9. The uWSGI and Nginx daemons enabled.
-   10. Certbot was installed (www.letsencrypt.com)
+   10. Certbot was installed (www.letsencrypt.com).
 
-Note, all passwords have been set to the password you provided. Also, it is high advised to secure your database before putting it into production.  
+Note, all passwords have been set to the password you provided. 
+
+Also, it is highly advised you secure the database before putting it into production.  
 """)
 secure_db = input("Would you like to secure your databse now? (y/n) ")
 if secure_db.lower() == "y":

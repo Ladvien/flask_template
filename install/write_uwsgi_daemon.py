@@ -10,6 +10,7 @@ After=network.target
 [Service]
 User=nginx
 Group=nginx
+Environment=DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name},
 WorkingDirectory=/usr/share/nginx/{app_name}/
 ExecStart=/usr/local/bin/uwsgi --ini /usr/share/nginx/{app_name}/app.ini
 Restart=always
