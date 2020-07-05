@@ -21,7 +21,7 @@ import getpass
 from write_nginx_conf import write_nginx_conf
 from write_uwsgi_daemon import write_uwsgi_daemon
 from write_uwsgi_ini import write_uwsgi_ini
-from util import execute_command_block
+from util import exec_cmd
 
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
@@ -41,10 +41,10 @@ print()
 site_name = site.split(".")[0]
 
 # Update the system.
-os.system("yum update -y")
+exec_cmd("yum update -y")
 
 # Install extra packages for RedHat
-os.system("yum install epel-release -y")
+exec_cmd("yum install epel-release -y")
 
 centos_dev_tools = " ".join([
         "python3-pip",
@@ -76,10 +76,10 @@ print("""
 #################
 """)
 # Install needed dev tools.
-os.system(f"yum install {centos_dev_tools} -y")
+exec_cmd(f"yum install {centos_dev_tools} -y")
 
 # Install Nginx
-os.system(f"yum install {nginx_and_tools} -y")
+exec_cmd(f"yum install {nginx_and_tools} -y")
 
 print("""
 #################
@@ -90,17 +90,17 @@ print("""
 # Setup user
 cmd_user_setup = f"""adduser {username}
 echo "{password}" | passwd --stdin {username}
-os.system(f"usermod -aG wheel {username}
+usermod -aG wheel {username}
 """
-execute_command_block(cmd_user_setup)
+exec_cmd(cmd_user_setup)
 
 # Open CentoS firewall
-cmd_firewall_setup =\ 
+cmd_firewall_setup =\
 """firewall-cmd --zone=public --permanent --add-service=http
 firewall-cmd --zone=public --permanent --add-service=https
 firewall-cmd --reload
 """
-execute_command_block(cmd_firewall_setup)
+exec_cmd(cmd_firewall_setup)
 
 #################
 # Setup Certbot #
@@ -119,8 +119,8 @@ os.chdir("..")
 daemon_file_path = os.getcwd() + f"/resources/{app_name}.service"
 write_uwsgi_daemon(daemon_file_path, username, password, app_name, site)
 os.chdir("./install")
-os.system(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
-os.system(f"chmod +rw /etc/systemd/system/{app_name}.service")
+exec_cmd(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
+exec_cmd(f"chmod +rw /etc/systemd/system/{app_name}.service")
 
 print("""
 ###############
@@ -128,7 +128,7 @@ print("""
 ###############
 """)
 # Install pipenv
-os.system(f"pip3 install {pip_packages}")
+exec_cmd(f"pip3 install {pip_packages}")
 os.chdir("..")
 uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
 write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
@@ -142,20 +142,21 @@ print("""
 app_abs_path = f"/usr/share/nginx/{app_name}/"
 
 if os.path.exists(app_abs_path):
-    os.system(f"rm -rf {app_abs_path}")
+    exec_cmd(f"rm -rf {app_abs_path}")
     print("Deleted old files.")
 
-os.system(f"cp -r app/ {app_abs_path}")
-os.system(f"chown -R nginx:nginx {app_abs_path}")
-os.system(f"chmod -R 777 {app_abs_path} ")
+exec_cmd(f"""cp -r app/ {app_abs_path}
+chown -R nginx:nginx {app_abs_path}
+chmod -R 777 {app_abs_path}
+""")
 
 print("""
 #########################
 # Start App Service     #
 #########################
 """)
-os.system(f"systemctl enable {app_name}.service")
-os.system(f"systemctl start {app_name}.service")
+exec_cmd(f"""systemctl enable {app_name}.service
+systemctl start {app_name}.service""")
 
 print("""
 #########################
@@ -167,12 +168,12 @@ print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
 print()
-os.system("systemctl start nginx.service")
+exec_cmd("systemctl start nginx.service")
 
 # os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
 
 # Add cron job to automatically renew.
-os.system("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
+exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
 
 print("""
 ###############
@@ -180,37 +181,41 @@ print("""
 ###############
 """)
 write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site)
-os.system("systemctl daemon-reload")
-os.system("systemctl restart nginx")
+exec_cmd("""systemctl daemon-reload
+systemctl restart nginx
+""")
 
 print("""
 ###################
 # Daemonize Flask #
 ###################
 """)
-os.system(f"systemctl restart {app_name}.service")
+exec_cmd(f"systemctl restart {app_name}.service")
 
 print("""
 ####################################
 # Add Nginx Permissions to SELinux #
 ####################################
 """)
-os.system("setenforce Permissive")
-os.system("grep nginx /var/log/audit/audit.log | audit2allow -M nginx")
-os.system("semodule -i nginx.pp")
-os.system("setenforce Enforcing")
+exec_cmd("""setenforce Permissive
+grep nginx /var/log/audit/audit.log | audit2allow -M nginx
+semodule -i nginx.pp
+setenforce Enforcing
+""")
 
 print("""
 ####################################
 # Installing MariaDB               #
 ####################################
 """)
-
 cmd_mariadb_setup = """
 yum install wget -y
 wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
 chmod +x mariadb_repo_setup
 ./mariadb_repo_setup
+rm mariadb_repo_setup
 yum install MariaDB-server -y
+systemctl enable mysql.service
+systemctl start mysql.service
 """
-execute_command_block(cmd_mariadb_setup)
+exec_cmd(cmd_mariadb_setup)
