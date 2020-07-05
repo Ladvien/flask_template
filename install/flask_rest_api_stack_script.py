@@ -212,7 +212,7 @@ yum install wget -y
 wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
 chmod +x mariadb_repo_setup
 ./mariadb_repo_setup
-rm mariadb_repo_setup
+rm -f mariadb_repo_setup*
 yum install MariaDB-server -y
 systemctl enable mysql.service
 systemctl start mysql.service
