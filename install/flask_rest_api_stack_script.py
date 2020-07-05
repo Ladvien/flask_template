@@ -217,5 +217,6 @@ rm mariadb_repo_setup
 yum install MariaDB-server -y
 systemctl enable mysql.service
 systemctl start mysql.service
+mysql_secure_installation
 """
 exec_cmd(cmd_mariadb_setup)
