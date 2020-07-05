@@ -21,7 +21,7 @@ import getpass
 from write_nginx_conf import write_nginx_conf
 from write_uwsgi_daemon import write_uwsgi_daemon
 from write_uwsgi_ini import write_uwsgi_ini
-from util import exec_cmd
+from util import exec_cmd, exec_mysql_cmd
 
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
@@ -40,7 +40,7 @@ print()
 
 site_name = site.split(".")[0]
 
-# Update the system.
+Update the system.
 exec_cmd("yum update -y")
 
 # Install extra packages for RedHat
@@ -220,3 +220,15 @@ systemctl start mysql.service
 mysql_secure_installation
 """
 exec_cmd(cmd_mariadb_setup)
+
+print(f"""
+############################################################
+# Creating DB {app_name} and user {app_name}               #
+############################################################
+""")
+exec_mysql_cmd(f"""
+CREATE DATABASE {app_name};
+CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
+GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
+FLUSH PRIVILEGES;
+""")
