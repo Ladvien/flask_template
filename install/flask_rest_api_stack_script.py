@@ -40,7 +40,7 @@ print()
 
 site_name = site.split(".")[0]
 
-Update the system.
+# Update the system.
 exec_cmd("yum update -y")
 
 # Install extra packages for RedHat
@@ -81,12 +81,11 @@ exec_cmd(f"yum install {centos_dev_tools} -y")
 # Install Nginx
 exec_cmd(f"yum install {nginx_and_tools} -y")
 
-print("""
-#################
-# Env. Setup    #
-#################
+print(f"""
+####################################
+# Creating Linux User {username}   #
+####################################
 """)
-
 # Setup user
 cmd_user_setup = f"""adduser {username}
 echo "{password}" | passwd --stdin {username}
@@ -94,6 +93,11 @@ usermod -aG wheel {username}
 """
 exec_cmd(cmd_user_setup)
 
+print(f"""
+####################################
+# Opening needed ports in firewall #
+####################################
+""")
 # Open CentoS firewall
 cmd_firewall_setup =\
 """firewall-cmd --zone=public --permanent --add-service=http
@@ -158,11 +162,6 @@ print("""
 exec_cmd(f"""systemctl enable {app_name}.service
 systemctl start {app_name}.service""")
 
-print("""
-#########################
-# Setup HTTPs for Nginx #
-#########################
-""")
 
 print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
@@ -217,7 +216,6 @@ rm mariadb_repo_setup
 yum install MariaDB-server -y
 systemctl enable mysql.service
 systemctl start mysql.service
-mysql_secure_installation
 """
 exec_cmd(cmd_mariadb_setup)
 
@@ -232,3 +230,22 @@ CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
 GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
 FLUSH PRIVILEGES;
 """)
+
+
+print(f"""
+If successful, this script has:
+    1. Updated the system.
+    2. Added Flask, SQLAlchemy, Nginx, uWSGI, and MariaDB.
+    3. Setup a Linux user called {username}
+    4. Setup a start Flask API project at /usr/share/nginx/{app_name}
+    5. Configured Nginx to reverse proxty uWGI, which serves the Flask app {app_name}
+    6. Latest version of MaraiDB, added a user called {app_name} and a DB called {app_name}.
+    7. A uWSGI daemon created at /etc/systemd/system/{app_name}.service
+    8. The uWSGI and Nginx daemons enabled.
+    9. Certbot was installed (www.letsencrypt.com)
+
+Note, all passwords have been set to the password you provided. Also, it is high advised to secure your database before putting it into production.  
+""")
+secure_db = input("Would you like to secure your databse now? (y/n) ")
+if secure_db.lower() == "y":
+    exec_cmd("mysql_secure_installation")
