@@ -239,6 +239,12 @@ print(f"""
 exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_profile")
 exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
 
+print(f"""
+#########################
+# Creating symlink      #
+#########################
+""")
+exec_cmd(f"ln -s /usr/share/nginx/{app_name}/ /home/{username}/{app_name}")
 
 print("""
 ###################
@@ -249,6 +255,9 @@ exec_cmd("rm -f ../resources/*")
 
 
 print(f"""
+#################
+# Setup Debrief #
+#################
 If successful, this script has:
     1. Updated the system.
     2. Added Flask, SQLAlchemy, Nginx, uWSGI, and MariaDB.
@@ -258,10 +267,18 @@ If successful, this script has:
     6. Installed the latest version of MaraiDB and added a user called {app_name}.
     7. Added a DB called {app_name}.
     8. A uWSGI daemon created at /etc/systemd/system/{app_name}.service
-    9. The uWSGI and Nginx daemons enabled.
+    9. The enabled the uWSGI and Nginx daemons.
    10. Certbot was installed (www.letsencrypt.com).
 
-Note, all passwords have been set to the password you provided. 
+#####################
+# Developer's Notes #
+#####################
+    1. You can login with the {username} and password you provided.
+    2. The application has been symlinked to your home directory.
+    3. Running the script "run_app.py" lowers the 5000 port, runs the app for testing, 
+       and then closes the port again.  Please note, this does not stop the production
+       service.  That can be done by running:
+            systemctl stop {app_name}.service
 
 Also, it is highly advised you secure the database before putting it into production.  
 """)
