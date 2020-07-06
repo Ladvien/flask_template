@@ -11,9 +11,6 @@ On CentOS 7:
         https://stackoverflow.com/a/49492644
       
 """
-
-
-
 import os
 import pip
 import getpass
@@ -36,7 +33,7 @@ username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
 site = input("Site name? (e.g., cool-site.com) ")
-https = input("Setup HTTPs? (y/n) ")
+https = input("Setup HTTPS? (y/n) ")
 if https.lower() == "y":
     https = True
 else:
