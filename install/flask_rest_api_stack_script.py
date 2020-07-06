@@ -36,7 +36,7 @@ username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
 site = input("Site name? (e.g., cool-site.com) ")
-https = input("Setup HTTPs? (y / n)")
+https = input("Setup HTTPs? (y/n) ")
 if https.lower() == "y":
     https = True
 else:
@@ -142,7 +142,7 @@ print("""
 exec_cmd(f"pip3 install {pip_packages}")
 os.chdir("..")
 uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
-write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
+write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site, https)
 
 print("""
 #########################

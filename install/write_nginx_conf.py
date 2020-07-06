@@ -5,7 +5,7 @@ def write_nginx_conf(write_path, username, password, app_name, site, https):
 
     server_block = ""
     if https:
-    server_block = """# Settings for a TLS enabled server.
+        server_block = f"""# Settings for a TLS enabled server.
     server {{
         listen       443 ssl http2 default_server;
         listen       [::]:443 ssl http2 default_server;
