@@ -240,6 +240,17 @@ exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_pro
 exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
 
 print(f"""
+############################################################
+# Creating self-signed HTTPS certificate                   #
+############################################################
+""")
+exec_cmd(f"""
+openssl genrsa -out /usr/share/nginx/{app_name}/{app_name}.key 2048
+openssl req -new -key /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.csr
+openssl x509 -req -days 365 -in /usr/share/nginx/{app_name}/{app_name}.csr -signkey /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.crt
+""")
+
+print(f"""
 #########################
 # Creating symlink      #
 #########################

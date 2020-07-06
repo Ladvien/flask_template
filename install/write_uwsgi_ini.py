@@ -7,6 +7,7 @@ f"""[uwsgi]
 module = wsgi:app
 uid = nginx
 gid = nginx
+https = =0,{app_name}.crt,{app_name}.key,HIGH
 chown-socket = nginx:nginx
 chmod-socket = 777
 
