@@ -120,12 +120,11 @@ print("""
 # Create Daemon #
 #################
 """)
-os.chdir("..")
-daemon_file_path = os.getcwd() + f"/resources/{app_name}.service"
+daemon_file_path = os.getcwd() + f"/{app_name}.service"
 write_uwsgi_daemon(daemon_file_path, username, password, app_name, site)
-os.chdir("./install")
 exec_cmd(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
 exec_cmd(f"chmod +rw /etc/systemd/system/{app_name}.service")
+exec_cmd(f"rm -rf {daemon_file_path}")
 
 print("""
 ###############
@@ -247,12 +246,6 @@ print(f"""
 """)
 exec_cmd(f"ln -s /usr/share/nginx/{app_name}/ /home/{username}/{app_name}")
 
-print("""
-###################
-# Clean Up        #
-###################
-""")
-exec_cmd("rm -f ../resources/*")
 
 
 print(f"""
