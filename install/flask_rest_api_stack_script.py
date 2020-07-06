@@ -36,6 +36,12 @@ username = input("What's the name the user? ")
 password = getpass.getpass(prompt = "Password: ")
 app_name = input("What's your app name? ")
 site = input("Site name? (e.g., cool-site.com) ")
+https = input("Setup HTTPs? (y / n)")
+if https.lower() == "y":
+    https = True
+else:
+    https = False
+
 print()
 
 site_name = site.split(".")[0]
@@ -155,31 +161,34 @@ chown -R nginx:nginx {app_abs_path}
 chmod -R 777 {app_abs_path}
 """)
 
-print("""
-#########################
-# Start App Service     #
-#########################
-""")
-exec_cmd(f"""systemctl enable {app_name}.service
-systemctl start {app_name}.service""")
+if https:
+    print("#############################################")
+    print("# Time to setup HTTPs using Certbot         #")
+    print("#############################################")
+    exec_cmd("systemctl start nginx.service")
 
+    os.system(f"certbot --nginx -d {site}.com -d www.{site}")
 
-print("#############################################")
-print("# Time to setup HTTPs using Certbot         #")
-print("#############################################")
-exec_cmd("systemctl start nginx.service")
+    # Add cron job to automatically renew.
+    exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
 
-# os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
-
-# Add cron job to automatically renew.
-exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
+# print(f"""
+# ############################################################
+# # Creating self-signed HTTPS certificate for testing       #
+# ############################################################
+# """)
+# exec_cmd(f"""
+# openssl genrsa -out /usr/share/nginx/{app_name}/{app_name}.key 2048
+# openssl req -new -key /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.csr
+# openssl x509 -req -days 365 -in /usr/share/nginx/{app_name}/{app_name}.csr -signkey /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.crt
+# """)
 
 print("""
 ###############
 # Setup Nginx #
 ###############
 """)
-write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site)
+write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site, https)
 exec_cmd("""systemctl daemon-reload
 systemctl restart nginx
 """)
@@ -240,24 +249,19 @@ exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_pro
 exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
 
 print(f"""
-############################################################
-# Creating self-signed HTTPS certificate                   #
-############################################################
-""")
-exec_cmd(f"""
-openssl genrsa -out /usr/share/nginx/{app_name}/{app_name}.key 2048
-openssl req -new -key /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.csr
-openssl x509 -req -days 365 -in /usr/share/nginx/{app_name}/{app_name}.csr -signkey /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.crt
-""")
-
-print(f"""
 #########################
 # Creating symlink      #
 #########################
 """)
 exec_cmd(f"ln -s /usr/share/nginx/{app_name}/ /home/{username}/{app_name}")
 
-
+print("""
+#########################
+# Start App Service     #
+#########################
+""")
+exec_cmd(f"""systemctl enable {app_name}.service
+systemctl start {app_name}.service""")
 
 print(f"""
 #################
