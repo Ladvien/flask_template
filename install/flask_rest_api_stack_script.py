@@ -56,7 +56,6 @@ centos_dev_tools = " ".join([
         "libffi",
         "libffi-devel",
         "python3-setuptools",
-        "python-dateutil",
 ])
 
 nginx_and_tools = " ".join([
@@ -69,6 +68,8 @@ pip_packages = " ".join([
     "flask",
     "Flask-SQLAlchemy",
     "uwsgi",
+    "python-dateutil",
+    "PyMySQL",
 ])
 
 print("""
@@ -166,7 +167,6 @@ systemctl start {app_name}.service""")
 print("#############################################")
 print("# Time to setup HTTPs using Certbot         #")
 print("#############################################")
-print()
 exec_cmd("systemctl start nginx.service")
 
 # os.system(f"sudo certbot --nginx -d maddatum.com -d www.maddatum.com")
