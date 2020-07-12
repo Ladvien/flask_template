@@ -139,7 +139,7 @@ print("""
 exec_cmd(f"pip3 install {pip_packages}")
 os.chdir("..")
 uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
-write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site, https)
+write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
 
 print("""
 #########################
@@ -165,7 +165,7 @@ if https:
     exec_cmd("systemctl start nginx.service")
 
     print("CERTBOT NOT ON")
-    os.system(f"certbot -d {site}.com -d www.{site}")
+    # os.system(f"certbot -d {site}.com -d www.{site}")
 
     # Add cron job to automatically renew.
     exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
