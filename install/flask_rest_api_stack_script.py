@@ -165,22 +165,11 @@ if https:
     exec_cmd("systemctl start nginx.service")
 
     print("CERTBOT NOT ON")
-    exec_cmd(f"mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup")
-    # os.system(f"certbot -d {site}.com -d www.{site}")
+    exec_cmd(f"cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup")
+    os.system(f"certbot -d {site}.com -d www.{site}")
 
     # Add cron job to automatically renew.
     exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
-
-# print(f"""
-# ############################################################
-# # Creating self-signed HTTPS certificate for testing       #
-# ############################################################
-# """)
-# exec_cmd(f"""
-# openssl genrsa -out /usr/share/nginx/{app_name}/{app_name}.key 2048
-# openssl req -new -key /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.csr
-# openssl x509 -req -days 365 -in /usr/share/nginx/{app_name}/{app_name}.csr -signkey /usr/share/nginx/{app_name}/{app_name}.key -out /usr/share/nginx/{app_name}/{app_name}.crt
-# """)
 
 print("""
 ###############
@@ -189,7 +178,7 @@ print("""
 """)
 write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site, https)
 exec_cmd("""systemctl daemon-reload
-systemctl restart nginx
+systemctl restart nginx.service
 """)
 
 print("""
