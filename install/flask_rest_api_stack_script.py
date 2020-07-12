@@ -164,7 +164,8 @@ if https:
     print("#############################################")
     exec_cmd("systemctl start nginx.service")
 
-    os.system(f"certbot --nginx -d {site}.com -d www.{site}")
+    print("CERTBOT NOT ON")
+    os.system(f"certbot -d {site}.com -d www.{site}")
 
     # Add cron job to automatically renew.
     exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
