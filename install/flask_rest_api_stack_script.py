@@ -115,10 +115,6 @@ exec_cmd(cmd_firewall_setup)
 # Setup Certbot #
 #################
 
-# TODO: Configure Nginx.
-# TODO: Certbot
-# TODO: Install MariaDB
-
 print("""
 #################
 # Create Daemon #
@@ -164,9 +160,8 @@ if https:
     print("#############################################")
     exec_cmd("systemctl start nginx.service")
 
-    print("CERTBOT NOT ON")
     exec_cmd(f"cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup")
-    os.system(f"certbot -d {site}.com -d www.{site}")
+    os.system(f"certbot -d {site} -d www.{site}")
 
     # Add cron job to automatically renew.
     exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
