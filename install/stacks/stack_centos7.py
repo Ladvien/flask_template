@@ -15,30 +15,33 @@ import os
 import pip
 import getpass
 
-from file_templates.write_nginx_conf import write_nginx_conf
-from file_templates.write_uwsgi_daemon import write_uwsgi_daemon
-from file_templates.write_uwsgi_ini import write_uwsgi_ini
-from util import exec_cmd, exec_mysql_cmd
-from stack import Stack
+from .file_templates.write_nginx_conf import write_nginx_conf
+from .file_templates.write_uwsgi_daemon import write_uwsgi_daemon
+from .file_templates.write_uwsgi_ini import write_uwsgi_ini
+from .util import exec_cmd, exec_mysql_cmd
+from .stack import Stack
 
 
 class Centos7Stack(Stack):
-    def __init__(self, os):
-        self.centos_dev_tools = " ".join(
-            [
-                "python3-pip",
-                "python3-devel",
-                "gcc",
-                "gcc-c++",
-                "make",
-                "openssl-devel",
-                "libffi",
-                "libffi-devel",
-                "python3-setuptools",
-            ]
-        )
 
-        self.nginx_and_tools = " ".join(["nginx", "certbot", "python2-certbot-nginx",])
+    centos_dev_tools = " ".join(
+        [
+            "python3-pip",
+            "python3-devel",
+            "gcc",
+            "gcc-c++",
+            "make",
+            "openssl-devel",
+            "libffi",
+            "libffi-devel",
+            "python3-setuptools",
+        ]
+    )
+
+    nginx_and_tools = " ".join(["nginx", "certbot", "python2-certbot-nginx",])
+
+    def __init__(self):
+        pass
 
     def prepare(self):
         # Update the system.

@@ -15,13 +15,16 @@ import os
 import pip
 import getpass
 
-from file_configs.write_nginx_conf import write_nginx_conf
-from write_uwsgi_daemon import write_uwsgi_daemon
-from write_uwsgi_ini import write_uwsgi_ini
-from util import exec_cmd, exec_mysql_cmd
+from stacks.stack_centos7 import Centos7Stack
 
-from stack import Stack
-from os import Centos7
-
-stack = Stack()
+stack = Centos7Stack()
 stack.get_settings()
+stack.prepare()
+stack.install_dev_tools()
+stack.create_user()
+stack.firewall_setup()
+stack.create_uwsgi_daemon()
+stack.uwsgi_setup()
+stack.move_app_in_place()
+# stack.setup_certificate()
+stack.setup_nginx()

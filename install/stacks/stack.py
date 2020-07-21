@@ -15,13 +15,20 @@ import os
 import pip
 import getpass
 
-from write_nginx_conf import write_nginx_conf
-from write_uwsgi_daemon import write_uwsgi_daemon
-from write_uwsgi_ini import write_uwsgi_ini
-from util import exec_cmd, exec_mysql_cmd
+from .file_templates.write_nginx_conf import write_nginx_conf
+from .file_templates.write_uwsgi_daemon import write_uwsgi_daemon
+from .file_templates.write_uwsgi_ini import write_uwsgi_ini
+from .util import exec_cmd, exec_mysql_cmd
 
 class Stack:
-
+    
+    flask_pip_packages = " ".join([
+        "flask",
+        "Flask-SQLAlchemy",
+        "uwsgi",
+        "python-dateutil",
+        "PyMySQL",
+    ])
 
     def __init__(self, os):
         self._username = None
@@ -31,13 +38,7 @@ class Stack:
         self._site_name = None
         self._site = None
 
-        self.flask_pip_packages = " ".join([
-            "flask",
-            "Flask-SQLAlchemy",
-            "uwsgi",
-            "python-dateutil",
-            "PyMySQL",
-        ])
+
     
     def get_settings(self):
         print()
