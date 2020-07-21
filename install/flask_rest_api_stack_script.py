@@ -134,62 +134,62 @@ from util import exec_cmd, exec_mysql_cmd
 # uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
 # write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
 
-print("""
-#########################
-# Put App in Place      #
-#########################
-""")
-# Move the file to the user's directory.
-app_abs_path = f"/usr/share/nginx/{app_name}/"
+# print("""
+# #########################
+# # Put App in Place      #
+# #########################
+# """)
+# # Move the file to the user's directory.
+# app_abs_path = f"/usr/share/nginx/{app_name}/"
 
-if os.path.exists(app_abs_path):
-    exec_cmd(f"rm -rf {app_abs_path}")
-    print("Deleted old files.")
+# if os.path.exists(app_abs_path):
+#     exec_cmd(f"rm -rf {app_abs_path}")
+#     print("Deleted old files.")
 
-exec_cmd(f"""cp -r app/ {app_abs_path}
-chown -R nginx:nginx {app_abs_path}
-chmod -R 777 {app_abs_path}
-""")
+# exec_cmd(f"""cp -r app/ {app_abs_path}
+# chown -R nginx:nginx {app_abs_path}
+# chmod -R 777 {app_abs_path}
+# """)
 
-if https:
-    print("#############################################")
-    print("# Time to setup HTTPs using Certbot         #")
-    print("#############################################")
-    exec_cmd("systemctl start nginx.service")
+# if https:
+#     print("#############################################")
+#     print("# Time to setup HTTPs using Certbot         #")
+#     print("#############################################")
+#     exec_cmd("systemctl start nginx.service")
 
-    exec_cmd(f"cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup")
-    os.system(f"certbot -d {site} -d www.{site}")
+#     exec_cmd(f"cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup")
+#     os.system(f"certbot -d {site} -d www.{site}")
 
-    # Add cron job to automatically renew.
-    exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
+#     # Add cron job to automatically renew.
+#     exec_cmd("""echo "0 0,12 * * * root python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew -q" | sudo tee -a /etc/crontab > /dev/null""")
 
-print("""
-###############
-# Setup Nginx #
-###############
-""")
-write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site, https)
-exec_cmd("""systemctl daemon-reload
-systemctl restart nginx.service
-""")
+# print("""
+# ###############
+# # Setup Nginx #
+# ###############
+# """)
+# write_nginx_conf("/etc/nginx/nginx.conf", username, password, app_name, site, https)
+# exec_cmd("""systemctl daemon-reload
+# systemctl restart nginx.service
+# """)
 
-print("""
-###################
-# Daemonize Flask #
-###################
-""")
-exec_cmd(f"systemctl restart {app_name}.service")
+# print("""
+# ###################
+# # Daemonize Flask #
+# ###################
+# """)
+# exec_cmd(f"systemctl restart {app_name}.service")
 
-print("""
-####################################
-# Add Nginx Permissions to SELinux #
-####################################
-""")
-exec_cmd("""setenforce Permissive
-grep nginx /var/log/audit/audit.log | audit2allow -M nginx
-semodule -i nginx.pp
-setenforce Enforcing
-""")
+# print("""
+# ####################################
+# # Add Nginx Permissions to SELinux #
+# ####################################
+# """)
+# exec_cmd("""setenforce Permissive
+# grep nginx /var/log/audit/audit.log | audit2allow -M nginx
+# semodule -i nginx.pp
+# setenforce Enforcing
+# """)
 
 print("""
 ####################################

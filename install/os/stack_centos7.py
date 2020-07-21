@@ -15,9 +15,9 @@ import os
 import pip
 import getpass
 
-from write_nginx_conf import write_nginx_conf
-from write_uwsgi_daemon import write_uwsgi_daemon
-from write_uwsgi_ini import write_uwsgi_ini
+from file_templates.write_nginx_conf import write_nginx_conf
+from file_templates.write_uwsgi_daemon import write_uwsgi_daemon
+from file_templates.write_uwsgi_ini import write_uwsgi_ini
 from util import exec_cmd, exec_mysql_cmd
 from stack import Stack
 
@@ -40,7 +40,7 @@ class Centos7Stack(Stack):
 
         self.nginx_and_tools = " ".join(["nginx", "certbot", "python2-certbot-nginx",])
 
-    def update(self):
+    def prepare(self):
         # Update the system.
         exec_cmd("yum update -y")
 
@@ -106,4 +106,22 @@ class Centos7Stack(Stack):
         exec_cmd(f"chmod +rw /etc/systemd/system/{self._app_name}.service")
         exec_cmd(f"rm -rf {daemon_file_path}")
 
-    
+    def setup_nginx(self):
+        print("""
+        ###############
+        # Setup Nginx #
+        ###############
+        """)
+        write_nginx_conf("/etc/nginx/nginx.conf", self._username, self._password, self._app_name, self._site, self._https)
+        exec_cmd("""systemctl daemon-reload
+        systemctl restart nginx.service
+        """)
+
+    def start_flask_daemon(self):
+        print("""
+        ###################
+        # Daemonize Flask #
+        ###################
+        """)
+        exec_cmd(f"systemctl start {app_name}.service")
+        exec_cmd(f"systemctl enable {app_name}.service")
