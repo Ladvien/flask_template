@@ -23,119 +23,116 @@ from util import exec_cmd, exec_mysql_cmd
 # Resources used
 # https://phoenixnap.com/kb/how-to-install-nginx-on-centos-7
 
-print()
-print()
-print("#############################################")
-print("# Welcome to Nginx, Flask, and uWSGI setup. #")
-print("#############################################")
-print()
-username = input("What's the name the user? ")
-password = getpass.getpass(prompt = "Password: ")
-app_name = input("What's your app name? ")
-site = input("Site name? (e.g., cool-site.com) ")
-https = input("Setup HTTPS? (y/n) ")
-if https.lower() == "y":
-    https = True
-else:
-    https = False
+# print()
+# print()
+# print("#############################################")
+# print("# Welcome to Nginx, Flask, and uWSGI setup. #")
+# print("#############################################")
+# print()
+# username = input("What's the name the user? ")
+# password = getpass.getpass(prompt = "Password: ")
+# app_name = input("What's your app name? ")
+# site = input("Site name? (e.g., cool-site.com) ")
+# https = input("Setup HTTPS? (y/n) ")
+# if https.lower() == "y":
+#     https = True
+# else:
+#     https = False
 
-print()
+# print()
 
-site_name = site.split(".")[0]
+# site_name = site.split(".")[0]
 
-# Update the system.
-exec_cmd("yum update -y")
+# # Update the system.
+# exec_cmd("yum update -y")
 
-# Install extra packages for RedHat
-exec_cmd("yum install epel-release -y")
+# # Install extra packages for RedHat
+# exec_cmd("yum install epel-release -y")
 
-centos_dev_tools = " ".join([
-        "python3-pip",
-        "python3-devel",
-        "gcc", 
-        "gcc-c++",
-        "make", 
-        "openssl-devel",
-        "libffi",
-        "libffi-devel",
-        "python3-setuptools",
-])
+# centos_dev_tools = " ".join([
+#         "python3-pip",
+#         "python3-devel",
+#         "gcc", 
+#         "gcc-c++",
+#         "make", 
+#         "openssl-devel",
+#         "libffi",
+#         "libffi-devel",
+#         "python3-setuptools",
+# ])
 
-nginx_and_tools = " ".join([
-    "nginx",
-    "certbot",
-    "python2-certbot-nginx",
-])
+# nginx_and_tools = " ".join([
+#     "nginx",
+#     "certbot",
+#     "python2-certbot-nginx",
+# ])
 
-pip_packages = " ".join([
-    "flask",
-    "Flask-SQLAlchemy",
-    "uwsgi",
-    "python-dateutil",
-    "PyMySQL",
-])
+# pip_packages = " ".join([
+#     "flask",
+#     "Flask-SQLAlchemy",
+#     "uwsgi",
+#     "python-dateutil",
+#     "PyMySQL",
+# ])
 
-print("""
-#################
-# Install Tools #
-#################
-""")
-# Install needed dev tools.
-exec_cmd(f"yum install {centos_dev_tools} -y")
+# print("""
+# #################
+# # Install Tools #
+# #################
+# """)
+# # Install needed dev tools.
+# exec_cmd(f"yum install {centos_dev_tools} -y")
 
-# Install Nginx
-exec_cmd(f"yum install {nginx_and_tools} -y")
+# # Install Nginx
+# exec_cmd(f"yum install {nginx_and_tools} -y")
 
-print(f"""
-####################################
-# Creating Linux User {username}   #
-####################################
-""")
-# Setup user
-cmd_user_setup = f"""adduser {username}
-echo "{password}" | passwd --stdin {username}
-usermod -aG wheel {username}
-"""
-exec_cmd(cmd_user_setup)
+# print(f"""
+# ####################################
+# # Creating Linux User {username}   #
+# ####################################
+# """)
+# # Setup user
+# cmd_user_setup = f"""adduser {username}
+# echo "{password}" | passwd --stdin {username}
+# usermod -aG wheel {username}
+# """
+# exec_cmd(cmd_user_setup)
 
-print(f"""
-####################################
-# Opening needed ports in firewall #
-####################################
-""")
-# Open CentoS firewall
-cmd_firewall_setup =\
-"""firewall-cmd --zone=public --permanent --add-service=http
-firewall-cmd --zone=public --permanent --add-service=https
-firewall-cmd --reload
-"""
-exec_cmd(cmd_firewall_setup)
+# print(f"""
+# ####################################
+# # Opening needed ports in firewall #
+# ####################################
+# """)
+# # Open CentoS firewall
+# cmd_firewall_setup =\
+# """firewall-cmd --zone=public --permanent --add-service=http
+# firewall-cmd --zone=public --permanent --add-service=https
+# firewall-cmd --reload
+# """
+# exec_cmd(cmd_firewall_setup)
 
-#################
-# Setup Certbot #
-#################
 
-print("""
-#################
-# Create Daemon #
-#################
-""")
-daemon_file_path = os.getcwd() + f"/{app_name}.service"
-write_uwsgi_daemon(daemon_file_path, username, password, app_name, site)
-exec_cmd(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
-exec_cmd(f"chmod +rw /etc/systemd/system/{app_name}.service")
-exec_cmd(f"rm -rf {daemon_file_path}")
+# print("""
+# #################
+# # Create Daemon #
+# #################
+# """)
+# daemon_file_path = os.getcwd() + f"/{app_name}.service"
+# write_uwsgi_daemon(daemon_file_path, username, password, app_name, site)
+# exec_cmd(f"mv {daemon_file_path} /etc/systemd/system/{app_name}.service")
+# exec_cmd(f"chmod +rw /etc/systemd/system/{app_name}.service")
+# exec_cmd(f"rm -rf {daemon_file_path}")
 
-print("""
-###############
-# Setup uWSGI #
-###############
-""")
-# Install pipenv
-exec_cmd(f"pip3 install {pip_packages}")
-os.chdir("..")
-uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
-write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
+# print("""
+# ###############
+# # Setup uWSGI #
+# ###############
+# """)
+# # Install pipenv
+# exec_cmd(f"pip3 install {pip_packages}")
+# os.chdir("..")
+# uwsgi_ini_path = os.getcwd() + f"/app/app.ini"
+# write_uwsgi_ini(uwsgi_ini_path, username, password, app_name, site)
 
 print("""
 #########################
