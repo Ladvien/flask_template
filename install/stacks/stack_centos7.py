@@ -128,3 +128,21 @@ class Centos7Stack(Stack):
         """)
         exec_cmd(f"systemctl start {app_name}.service")
         exec_cmd(f"systemctl enable {app_name}.service")
+
+    def install_mariadb(self):
+        print("""
+        ####################################
+        # Installing MariaDB               #
+        ####################################
+        """)
+        cmd_mariadb_setup = """
+        yum install wget -y
+        wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+        chmod +x mariadb_repo_setup
+        ./mariadb_repo_setup
+        rm -f mariadb_repo_setup*
+        yum install MariaDB-server -y
+        systemctl enable mysql.service
+        systemctl start mysql.service
+        """
+        exec_cmd(cmd_mariadb_setup)

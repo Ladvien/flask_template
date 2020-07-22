@@ -191,49 +191,49 @@ from util import exec_cmd, exec_mysql_cmd
 # setenforce Enforcing
 # """)
 
-print("""
-####################################
-# Installing MariaDB               #
-####################################
-""")
-cmd_mariadb_setup = """
-yum install wget -y
-wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
-chmod +x mariadb_repo_setup
-./mariadb_repo_setup
-rm -f mariadb_repo_setup*
-yum install MariaDB-server -y
-systemctl enable mysql.service
-systemctl start mysql.service
-"""
-exec_cmd(cmd_mariadb_setup)
+# print("""
+# ####################################
+# # Installing MariaDB               #
+# ####################################
+# """)
+# cmd_mariadb_setup = """
+# yum install wget -y
+# wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+# chmod +x mariadb_repo_setup
+# ./mariadb_repo_setup
+# rm -f mariadb_repo_setup*
+# yum install MariaDB-server -y
+# systemctl enable mysql.service
+# systemctl start mysql.service
+# """
+# exec_cmd(cmd_mariadb_setup)
 
-print(f"""
-############################################################
-# Creating DB {app_name} and user {app_name}               #
-############################################################
-""")
-exec_mysql_cmd(f"""
-CREATE DATABASE {app_name};
-CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
-GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
-FLUSH PRIVILEGES;
-""")
+# print(f"""
+# ############################################################
+# # Creating DB {app_name} and user {app_name}               #
+# ############################################################
+# """)
+# exec_mysql_cmd(f"""
+# CREATE DATABASE {app_name};
+# CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
+# GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
+# FLUSH PRIVILEGES;
+# """)
 
-print(f"""
-############################################################
-# Create the DATABASE_URL environment variable             #
-############################################################
-""")
-exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_profile")
-exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
+# print(f"""
+# ############################################################
+# # Create the DATABASE_URL environment variable             #
+# ############################################################
+# """)
+# exec_cmd(f"\necho '# Used by Flask app {app_name}' >> /home/{username}/.bash_profile")
+# exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{app_name}:{password}@localhost/{app_name}' >> /home/{username}/.bash_profile")
 
-print(f"""
-#########################
-# Creating symlink      #
-#########################
-""")
-exec_cmd(f"ln -s /usr/share/nginx/{app_name}/ /home/{username}/{app_name}")
+# print(f"""
+# #########################
+# # Creating symlink      #
+# #########################
+# """)
+# exec_cmd(f"ln -s /usr/share/nginx/{app_name}/ /home/{username}/{app_name}")
 
 print("""
 #########################

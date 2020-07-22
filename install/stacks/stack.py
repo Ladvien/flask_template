@@ -121,3 +121,37 @@ class Stack:
 
     def setup_nginx(self):
         raise NotImplementedError
+
+    def install_mariadb(self):
+        raise NotImplementedError
+
+    def setup_mariadb(self):
+        print(f"""
+        ############################################################
+        # Creating DB {app_name} and user {app_name}               #
+        ############################################################
+        """)
+        exec_mysql_cmd(f"""
+        CREATE DATABASE {app_name};
+        CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
+        GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
+        FLUSH PRIVILEGES;
+        """)
+
+    def create_database_url_env_var(self):
+        print(f"""
+        ############################################################
+        # Create the DATABASE_URL environment variable             #
+        ############################################################
+        """)
+        exec_cmd(f"\necho '# Used by Flask app {self._app_name}' >> /home/{self._username}/.bash_profile")
+        exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{self._app_name}:{self._password}@localhost/{self._app_name}' >> /home/{self._username}/.bash_profile")
+
+
+    def create_app_symlink_for_user(self):
+        print(f"""
+        #########################
+        # Creating symlink      #
+        #########################
+        """)
+        exec_cmd(f"ln -s /usr/share/nginx/{self._app_name}/ /home/{self._username}/{self._app_name}")
