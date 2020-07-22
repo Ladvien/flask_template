@@ -120,15 +120,6 @@ class Centos7Stack(Stack):
         systemctl restart nginx.service
         """)
 
-    def start_flask_daemon(self):
-        print("""
-        ###################
-        # Daemonize Flask #
-        ###################
-        """)
-        exec_cmd(f"systemctl start {app_name}.service")
-        exec_cmd(f"systemctl enable {app_name}.service")
-
     def install_mariadb(self):
         print("""
         ####################################

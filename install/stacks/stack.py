@@ -132,9 +132,9 @@ class Stack:
         ############################################################
         """)
         exec_mysql_cmd(f"""
-        CREATE DATABASE {app_name};
-        CREATE USER {app_name}@localhost IDENTIFIED BY '{password}';
-        GRANT ALL PRIVILEGES ON {app_name}.* TO '{app_name}'@'localhost';
+        CREATE DATABASE {self._app_name};
+        CREATE USER {self._app_name}@localhost IDENTIFIED BY '{self._password}';
+        GRANT ALL PRIVILEGES ON {self._app_name}.* TO '{self._app_name}'@'localhost';
         FLUSH PRIVILEGES;
         """)
 
@@ -155,14 +155,16 @@ class Stack:
         """)
         exec_cmd(f"ln -s /usr/share/nginx/{self._app_name}/ /home/{self._username}/{self._app_name}")
 
-    def start_app_daemon(self):
+
+    def start_flask_daemon(self):
         print("""
-        #########################
-        # Start App Service     #
-        #########################
+        ###################
+        # Daemonize Flask #
+        ###################
         """)
-        exec_cmd(f"""systemctl enable {self._app_name}.service
-        systemctl start {self._app_name}.service""")
+        exec_cmd(f"systemctl start {self._app_name}.service")
+        exec_cmd(f"systemctl enable {self._app_name}.service")
+
 
     def debrief(self):
         print(f"""
