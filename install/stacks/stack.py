@@ -147,7 +147,6 @@ class Stack:
         exec_cmd(f"\necho '# Used by Flask app {self._app_name}' >> /home/{self._username}/.bash_profile")
         exec_cmd(f"echo 'export DATABASE_URL=mysql+pymysql://{self._app_name}:{self._password}@localhost/{self._app_name}' >> /home/{self._username}/.bash_profile")
 
-
     def create_app_symlink_for_user(self):
         print(f"""
         #########################
@@ -155,3 +154,45 @@ class Stack:
         #########################
         """)
         exec_cmd(f"ln -s /usr/share/nginx/{self._app_name}/ /home/{self._username}/{self._app_name}")
+
+    def start_app_daemon(self):
+        print("""
+        #########################
+        # Start App Service     #
+        #########################
+        """)
+        exec_cmd(f"""systemctl enable {self._app_name}.service
+        systemctl start {self._app_name}.service""")
+
+    def debrief(self):
+        print(f"""
+        #################
+        # Setup Debrief #
+        #################
+        If successful, this script has:
+            1. Updated the system.
+            2. Added Flask, SQLAlchemy, Nginx, uWSGI, and MariaDB.
+            3. Setup a Linux user called {self._username}.
+            4. Setup a base Flask API project at /usr/share/nginx/{self._app_name}
+            5. Configured Nginx to reverse proxty uWSGI, which serves the Flask app {self._app_name}.
+            6. Installed the latest version of MaraiDB and added a user called {self._app_name}.
+            7. Added a DB called {self._app_name}.
+            8. A uWSGI daemon created at /etc/systemd/system/{self._app_name}.service
+            9. The enabled the uWSGI and Nginx daemons.
+        10. Certbot was installed (www.letsencrypt.com).
+
+        #####################
+        # Developer's Notes #
+        #####################
+            1. You can login with the {self._username} and password you provided.
+            2. The application has been symlinked to your home directory.
+            3. Running the script "run_app.py" lowers the 5000 port, runs the app for testing, 
+            and then closes the port again.  Please note, this does not stop the production
+            service.  That can be done by running:
+                    systemctl stop {self._app_name}.service
+
+        Also, it is highly advised you secure the database before putting it into production.  
+        """)
+        secure_db = input("Would you like to secure your database now? (y/n) ")
+        if secure_db.lower() == "y":
+            exec_cmd("mysql_secure_installation")
