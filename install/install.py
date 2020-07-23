@@ -14,23 +14,30 @@ On CentOS 7:
 import os
 import pip
 import getpass
-
+from platform import platform
 from stacks.stack_centos7 import Centos7Stack
+from stacks.stack_ubuntu18 import Ubuntu18Stack
 
-stack = Centos7Stack()
+if "ubuntu" in platform().lower():
+    stack = Ubuntu18Stack()
+elif "centos" in platform().lower():
+    stack = Centos7Stack()
+else:
+    raise Exception("Unsupported operating system.")
+
 stack.get_settings()
 stack.prepare()
 stack.install_dev_tools()
 stack.create_user()
-stack.firewall_setup()
-stack.create_uwsgi_daemon()
-stack.uwsgi_setup()
-stack.move_app_in_place()
-# stack.setup_certificate()
-stack.setup_nginx()
-stack.install_mariadb()
-stack.setup_mariadb()
-stack.create_database_url_env_var()
-stack.create_app_symlink_for_user()
-stack.start_flask_daemon()
-stack.debrief()
+# stack.firewall_setup()
+# stack.create_uwsgi_daemon()
+# stack.uwsgi_setup()
+# stack.move_app_in_place()
+# # stack.setup_certificate()
+# stack.setup_nginx()
+# stack.install_mariadb()
+# stack.setup_mariadb()
+# stack.create_database_url_env_var()
+# stack.create_app_symlink_for_user()
+# stack.start_flask_daemon()
+# stack.debrief()

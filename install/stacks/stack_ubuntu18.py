@@ -22,30 +22,29 @@ from .util import exec_cmd, exec_mysql_cmd
 from .stack import Stack
 
 
-class Centos7Stack(Stack):
+class Ubuntu18Stack(Stack):
 
     centos_dev_tools = " ".join(
         [
-            "python3-pip",
-            "python3-devel",
-            "gcc",
-            "gcc-c++",
-            "make",
-            "openssl-devel",
-            "libffi",
-            "libffi-devel",
+            "python3-dev",
+            "build-essential",
+            # "gcc-c++",
+            # "make",
+            "libssl-dev",
+            "libffi6",
+            "libffi-dev",
             "python3-setuptools",
         ]
     )
 
-    nginx_and_tools = " ".join(["nginx", "certbot", "python2-certbot-nginx",])
+    nginx_and_tools = " ".join(["nginx", "certbot", "python3-certbot-nginx",])
 
     def __init__(self):
         pass
 
     def prepare(self):
         # Update the system.
-        exec_cmd("apt-get update -y")
+        exec_cmd("apt-get update")
 
     def install_dev_tools(self):
         print(
@@ -55,13 +54,11 @@ class Centos7Stack(Stack):
 #################
         """
         )
-        # Install extra packages for RedHat
-        exec_cmd("yum install epel-release -y")
         # Install needed dev tools.
-        exec_cmd(f"yum install {self.centos_dev_tools} -y")
+        exec_cmd(f"apt-get -y install {self.centos_dev_tools}")
 
         # Install Nginx
-        exec_cmd(f"yum install {self.nginx_and_tools} -y")
+        exec_cmd(f"apt-get -y install {self.nginx_and_tools}")
 
     def create_user(self):
         print(
@@ -72,9 +69,9 @@ class Centos7Stack(Stack):
         """
         )
         # Setup user
-        cmd_user_setup = f"""adduser {self._username}
-        echo "{self._password}" | passwd --stdin {self._username}
-        usermod -aG wheel {self._username}
+        cmd_user_setup = f"""useradd {self._username} -s /bin/bash -m
+        echo "{self._username}:{self._password}" } chpasswd
+        usermod -aG sudo {self._username}
         """
         exec_cmd(cmd_user_setup)
 
