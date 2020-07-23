@@ -128,7 +128,7 @@ class Stack:
     def setup_mariadb(self):
         print(f"""
         ############################################################
-        # Creating DB {self._app_name} and user {self.app_name}    #
+        # Creating DB {self._app_name} and user {self._app_name}    #
         ############################################################
         """)
         exec_mysql_cmd(f"""
