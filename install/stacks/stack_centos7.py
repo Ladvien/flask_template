@@ -50,9 +50,9 @@ class Centos7Stack(Stack):
     def install_dev_tools(self):
         print(
             """
-        #################
-        # Install Tools #
-        #################
+#################
+# Install Tools #
+#################
         """
         )
         # Install extra packages for RedHat
@@ -66,9 +66,9 @@ class Centos7Stack(Stack):
     def create_user(self):
         print(
             f"""
-        ####################################
-        # Creating Linux User {self._username}   #
-        ####################################
+###########################################
+# Creating Linux User {self._username}    #
+###########################################
         """
         )
         # Setup user
@@ -81,9 +81,9 @@ class Centos7Stack(Stack):
     def firewall_setup(self):
         print(
             f"""
-        ####################################
-        # Opening needed ports in firewall #
-        ####################################
+####################################
+# Opening needed ports in firewall #
+####################################
         """
         )
         # Open CentoS firewall
@@ -96,9 +96,9 @@ class Centos7Stack(Stack):
     def create_uwsgi_daemon(self):
         print(
             """
-        #################
-        # Create Daemon #
-        #################
+#################
+# Create Daemon #
+#################
         """
         )
         daemon_file_path = os.getcwd() + f"/{self._app_name}.service"
@@ -111,9 +111,9 @@ class Centos7Stack(Stack):
 
     def setup_nginx(self):
         print("""
-        ###############
-        # Setup Nginx #
-        ###############
+###############
+# Setup Nginx #
+###############
         """)
         write_nginx_conf("/etc/nginx/nginx.conf", self._username, self._password, self._app_name, self._site, self._https)
         exec_cmd("""systemctl daemon-reload
@@ -122,9 +122,9 @@ class Centos7Stack(Stack):
 
     def install_mariadb(self):
         print("""
-        ####################################
-        # Installing MariaDB               #
-        ####################################
+####################################
+# Installing MariaDB               #
+####################################
         """)
         cmd_mariadb_setup = """
         yum install wget -y
